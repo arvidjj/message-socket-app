@@ -1,13 +1,16 @@
-import { useState } from 'react'
+
+import React from 'react'
+
 import { Routes, Route, Navigate } from "react-router-dom"
 import './App.css'
 import Chat from './components/Chat'
 import Register from './components/Register'
 import Login from './components/Login'
 import Header from './components/Header'
-
+import { useAuth } from './CurrentUserContext';
 
 function App() {
+  const { value } = useAuth();
 
   return (
     <>
