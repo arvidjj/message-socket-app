@@ -13,11 +13,12 @@ const mongoose = require('mongoose');
 
 var app = express();
 
-mongoose.connect(process.env.DB_ADDRESS, {useNewUrlParser: true});
+mongoose.connect(process.env.DB_ADDRESS);
 
 //auth
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+const JwtStrategy = require('passport-jwt').Strategy;
 const session = require('express-session');
 const User = require('./models/user');
 const bcrypt = require('bcrypt');
@@ -32,7 +33,29 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+//JWT
+const cookieExtractor = req => {
+  let jwt = null 
+  //console.log(req.cookies['jwauth'])
+  if (req && req.cookies) {
+      jwt = req.cookies['jwauth']
+  }
 
+  return jwt
+}
+passport.use(new JwtStrategy(
+  {
+    secretOrKey: process.env.JWT_SECRET,
+    jwtFromRequest: cookieExtractor,
+  },
+  async (token, done) => {
+    try {
+      return done(null, token.user);
+    } catch (err) {
+      done(err);
+    }
+  }
+));
 //SESSION
 passport.use(new LocalStrategy({ usernameField: 'email', passwordField: 'password' },
   async (email, password, done) => {

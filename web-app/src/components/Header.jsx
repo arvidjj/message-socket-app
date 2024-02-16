@@ -1,8 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../CurrentUserContext';
 
 const Header = () => {
     const navigate = useNavigate();
+
+    const { currentUser } = useAuth();
+
 
   return (
     <header className='flex '>
@@ -11,8 +15,19 @@ const Header = () => {
         </div>
 
       <h1>Messaging App</h1>
-      <a href="/register"><button>Sign up</button></a>
-      <a href="/login"><button>Login</button></a>
+
+      {currentUser ? (
+        <div>
+          <p>{currentUser.username}</p>
+        <button onClick={() => navigate('/login')}>Logout</button>
+        </div>
+      ) : (
+        <div>
+          <a href="/login"><button>Login</button></a>
+          <a href="/register"><button>Sign up</button></a>
+        </div>
+      )}
+
     </header>
   );
 };

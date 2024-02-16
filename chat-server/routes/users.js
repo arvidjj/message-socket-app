@@ -3,10 +3,16 @@ var router = express.Router();
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
+const jwt = require('jsonwebtoken');
+
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   res.send('respond with a resource');
+});
+
+router.get('/me', passport.authenticate('jwt', { session: false }), function(req, res, next) {
+  res.json(req.user);
 });
 
 router.post('/', async function(req, res, next) {
@@ -39,5 +45,6 @@ router.post('/', async function(req, res, next) {
   }
 
 });
+
 
 module.exports = router;

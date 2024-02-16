@@ -1,5 +1,5 @@
 
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import { Routes, Route, Navigate } from "react-router-dom"
 import './App.css'
@@ -8,9 +8,17 @@ import Register from './components/Register'
 import Login from './components/Login'
 import Header from './components/Header'
 import { useAuth } from './CurrentUserContext';
+import { useCookies } from "react-cookie";
 
 function App() {
-  const { value } = useAuth();
+  const { fetchCurrentUser } = useAuth();
+  const [cookies, setCookie, removeCookie] = useCookies(["jwauth"]);
+
+  useEffect(() => {
+    if (cookies.jwauth) {
+      fetchCurrentUser();
+    }
+  } ,[])
 
   return (
     <>

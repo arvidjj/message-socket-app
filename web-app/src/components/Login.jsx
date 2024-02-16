@@ -1,9 +1,16 @@
 import React, { useState } from 'react';
 import apiInstance from '../../apiInstance';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../CurrentUserContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const { login } = useAuth();
+
+  const navigate = useNavigate();
+
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -16,8 +23,8 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await apiInstance.post('/login', { email, password });
-      console.log(response);
+      await login(email, password);
+      navigate('/');
     } catch (error) {
       console.error(error);
     }
