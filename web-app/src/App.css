@@ -1,11 +1,10 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
   padding: 2rem;
   text-align: center;
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
+
+  width:100%;
 }
 
 .logo {
@@ -47,8 +46,6 @@
 .chat-area {
   display:flex;
   flex-direction: column;
-  width: 500px;
-  height: 500px;
   background-color: white;
   color:black;
   align-items: flex-start ;

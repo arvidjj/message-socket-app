@@ -11,6 +11,8 @@ const jwt = require('jsonwebtoken');
 
 const mongoose = require('mongoose');
 
+const messagesController = require('./controllers/messagesController');
+
 var app = express();
 
 mongoose.connect(process.env.DB_ADDRESS);
@@ -35,10 +37,10 @@ app.use(passport.initialize());
 app.use(passport.session());
 //JWT
 const cookieExtractor = req => {
-  let jwt = null 
+  let jwt = null
   //console.log(req.cookies['jwauth'])
   if (req && req.cookies) {
-      jwt = req.cookies['jwauth']
+    jwt = req.cookies['jwauth']
   }
 
   return jwt
@@ -92,27 +94,33 @@ passport.deserializeUser(async (id, done) => {
 
 /////////////////
 //cors configure
-app.use(cors( {origin: "http://localhost:5173", credentials: true}));
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 
 
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: {origin:"http://localhost:5173", methods: ["GET", "POST"]},
+  cors: { origin: "http://localhost:5173", methods: ["GET", "POST"] },
 });
 
 server.listen(4000, () => { console.log("listening on *:4000"); });
 
 io.on("connection", (socket) => {
-  console.log(`a user connected ${socket.id}`);
-  
+  //console.log(`a user connected ${socket.id}`);
+
   socket.on("send_message", (data) => {
-    socket.broadcast.emit("receive_message", data);
-    
+    try {
+      messagesController.createMessage(data);
+      socket.broadcast.emit("receive_message", data);
+    } catch (error) {
+      console.error(error);
+    }
+
   });
 });
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var messagesRouter = require('./routes/messages');
 
 
 // view engine setup
@@ -127,13 +135,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/messages', messagesRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

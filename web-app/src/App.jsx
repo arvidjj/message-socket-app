@@ -10,31 +10,41 @@ import Header from './components/Header'
 import { useAuth } from './CurrentUserContext';
 import { useCookies } from "react-cookie";
 
+
 function App() {
-  const { fetchCurrentUser } = useAuth();
+  const { fetchCurrentUser, currentUser } = useAuth();
   const [cookies, setCookie, removeCookie] = useCookies(["jwauth"]);
 
   useEffect(() => {
     if (cookies.jwauth) {
-      fetchCurrentUser();
+      if (!currentUser) {
+        fetchCurrentUser();
+      }
     }
-  } ,[])
+  }, [])
 
   return (
     <>
 
-      <Header />
-      <div className='app'>
-      <Routes>
-          <Route path="/" element={<Chat />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-        </Routes>
+      <div className='sidebar w-1/6'>
+        <div className='sidebar-header'>
+          <h1>Chat App</h1>
+        </div>
+        <div className='sidebar-content'>
+          <p>Your friends</p>
+        </div>
       </div>
 
-      <footer className='footer mt-auto'>
-        <p>&copy; 2024 Arvid.</p>
-      </footer>
+      <div className='flex flex-col flex-1'>
+        <Header />
+        <div className='app'>
+          <Routes>
+            <Route path="/" element={<Chat />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+          </Routes>
+        </div>
+      </div>
     </>
   )
 }

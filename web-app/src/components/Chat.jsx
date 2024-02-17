@@ -10,9 +10,18 @@ const Chat = () => {
 
   const { currentUser } = useAuth();
 
+  const fetchMessages = async () => {
+    const response = await fetch('http://localhost:3000/messages', { credentials: 'include', method: 'GET' });
+    const data = await response.json();
+    setMessages(data);
+  }
+
   useEffect(() => {
     // Attach event listener for receiving messages
     socket.on('receive_message', handleMessage);
+
+    // Fetch messages from the server
+    fetchMessages();
 
     // Clean up the event listener when the component unmounts
     return () => {
@@ -26,31 +35,32 @@ const Chat = () => {
 
   const handleSend = () => {
     // Emit the message to the server
-    socket.emit('send_message', { message });
-    handleMessage({ message });
+    socket.emit('send_message', { body: message, userId: currentUser.userId});
+    handleMessage({ body: message, username: currentUser.username});
     setMessage('');
   };
 
   const handleMessage = (data) => {
     // Update state with the new message
-    setMessages((prevMessages) => [...prevMessages, data.message]);
+    setMessages((prevMessages) => [...prevMessages, data]);
   };
 
   return (
-    <div>
+    <div className='flex flex-col items-stretch justify-stretch'>
       <h1>{typingUser ? `Writing to ${typingUser}` : 'Chat'}</h1>
-      <div className="chat-area">
-        {/* Display messages from state */}
-        {messages.map((msg, index) => (
-          <p key={index}>{msg}</p>
-        ))}
-      </div>
-      <div className="input-area">
+        <div className="chat-area h-full">
+          {/* Display messages from state */}
+          {messages.map((msg, index) => (
+            <p key={index}>{msg.username}: {msg.body}</p>
+          ))}
+        </div>
+      <div className="input-area flex">
         <input
           type="text"
           value={message}
           onChange={handleInputChange}
           placeholder="Type your message..."
+          className='flex-1'
         />
         <button onClick={handleSend}>Send</button>
       </div>

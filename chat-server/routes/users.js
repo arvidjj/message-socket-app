@@ -12,7 +12,12 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/me', passport.authenticate('jwt', { session: false }), function(req, res, next) {
-  res.json(req.user);
+  const userDto = {
+    username: req.user.username,
+    email: req.user.email,
+    userId: req.user._id
+  };
+  res.json(userDto);
 });
 
 router.post('/', async function(req, res, next) {
